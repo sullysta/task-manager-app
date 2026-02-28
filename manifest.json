@@ -1,0 +1,27 @@
+{
+  "name": "Sully's Task Manager",
+  "short_name": "Task Mgr",
+  "description": "Personal, Church, and Work task manager — San Bernardino DA's Office",
+  "start_url": "/task-manager-app/",
+  "scope": "/task-manager-app/",
+  "display": "standalone",
+  "background_color": "#1a1a2e",
+  "theme_color": "#16213e",
+  "orientation": "portrait-primary",
+  "lang": "en-US",
+  "categories": ["productivity", "utilities"],
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

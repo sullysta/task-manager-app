@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#16213e">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Task Mgr">
+  <meta name="description" content="Sully's personal task and case manager">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="stylesheet" href="styles.css">
+  <title>Sully's Task Manager</title>
+</head>
+<body>
+
+  <!-- App Header -->
+  <header class="app-header">
+    <h1 class="app-title">Sully's Task Manager</h1>
+    <nav class="tab-nav" role="tablist" aria-label="Categories">
+      <button class="tab-btn active" data-tab="personal" role="tab" aria-selected="true" aria-controls="personal-view">Personal</button>
+      <button class="tab-btn" data-tab="church" role="tab" aria-selected="false" aria-controls="church-view">Church</button>
+      <button class="tab-btn" data-tab="work" role="tab" aria-selected="false" aria-controls="work-view">Work</button>
+      <button class="tab-btn" data-tab="settings" role="tab" aria-selected="false" aria-controls="settings-view">&#9881;</button>
+    </nav>
+  </header>
+
+  <!-- Loading Bar -->
+  <div id="loading-bar" class="loading-bar" hidden></div>
+
+  <!-- Main Content Area -->
+  <main id="main-content">
+
+    <!-- ==================== PERSONAL TAB ==================== -->
+    <section id="personal-view" class="tab-view active" role="tabpanel" aria-labelledby="tab-personal">
+      <div class="view-header">
+        <h2>Personal Tasks</h2>
+        <button id="add-personal" class="btn-fab" aria-label="Add personal task" title="Add task">+</button>
+      </div>
+      <div id="personal-groups" class="groups-container"></div>
+      <details class="group-section archive-section">
+        <summary class="group-header archive-header">
+          <span class="group-label">&#128451; Archive</span>
+          <span class="group-count" id="personal-archive-count">0</span>
+        </summary>
+        <div class="group-content">
+          <div id="personal-archive" class="archive-list"></div>
+        </div>
+      </details>
+    </section>
+
+    <!-- ==================== CHURCH TAB ==================== -->
+    <section id="church-view" class="tab-view" role="tabpanel" aria-labelledby="tab-church">
+      <div class="view-header">
+        <h2>Church Tasks</h2>
+        <button id="add-church" class="btn-fab" aria-label="Add church task" title="Add task">+</button>
+      </div>
+      <div id="church-groups" class="groups-container"></div>
+      <details class="group-section archive-section">
+        <summary class="group-header archive-header">
+          <span class="group-label">&#128451; Archive</span>
+          <span class="group-count" id="church-archive-count">0</span>
+        </summary>
+        <div class="group-content">
+          <div id="church-archive" class="archive-list"></div>
+        </div>
+      </details>
+    </section>
+
+    <!-- ==================== WORK TAB ==================== -->
+    <section id="work-view" class="tab-view" role="tabpanel" aria-labelledby="tab-work">
+      <div class="view-header">
+        <h2>Work Cases</h2>
+        <button id="add-work" class="btn-fab" aria-label="Add work case" title="Add case">+</button>
+      </div>
+      <div class="search-wrapper">
+        <input id="work-search" class="search-input" type="search"
+               placeholder="&#128269; Search by case #, agency, or agent..."
+               autocomplete="off" autocorrect="off" spellcheck="false">
+      </div>
+      <div id="work-groups" class="groups-container"></div>
+      <details class="group-section archive-section">
+        <summary class="group-header archive-header">
+          <span class="group-label">&#128451; Archive</span>
+          <span class="group-count" id="work-archive-count">0</span>
+        </summary>
+        <div class="group-content">
+          <div id="work-archive" class="archive-list"></div>
+        </div>
+      </details>
+    </section>
+
+    <!-- ==================== SETTINGS TAB ==================== -->
+    <section id="settings-view" class="tab-view" role="tabpanel" aria-labelledby="tab-settings">
+      <div class="view-header">
+        <h2>Settings</h2>
+      </div>
+      <div class="settings-form">
+        <div class="form-group">
+          <label for="gh-owner">GitHub Username</label>
+          <input id="gh-owner" type="text" placeholder="your-github-username"
+                 autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
+        </div>
+        <div class="form-group">
+          <label for="gh-repo">Data Repository Name</label>
+          <input id="gh-repo" type="text" placeholder="task-manager-data"
+                 autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
+          <p class="field-hint">The name of your private GitHub repository that stores data</p>
+        </div>
+        <div class="form-group">
+          <label for="gh-token">Personal Access Token</label>
+          <input id="gh-token" type="password" placeholder="github_pat_xxxxxxxxxxxx"
+                 autocomplete="off">
+          <p class="field-hint">Fine-grained PAT with "Contents: Read and Write" on your data repo only</p>
+        </div>
+        <div class="settings-actions">
+          <button id="save-settings" class="btn-primary">Save Settings</button>
+          <button id="test-connection" class="btn-secondary">Test Connection</button>
+        </div>
+
+        <hr class="settings-divider">
+
+        <div class="settings-help">
+          <h3>Quick Setup Guide</h3>
+          <ol class="setup-steps">
+            <li>
+              <strong>Create the data repository</strong><br>
+              Go to GitHub → New repository → Name: <code>task-manager-data</code> → Private → Create
+            </li>
+            <li>
+              <strong>Add the initial data files</strong><br>
+              Upload the 3 JSON files from the <code>task-manager-data/</code> folder in this project
+              (<code>personal/tasks.json</code>, <code>church/tasks.json</code>, <code>work/cases.json</code>)
+            </li>
+            <li>
+              <strong>Create a Personal Access Token</strong><br>
+              GitHub → Settings → Developer settings → Personal access tokens → Fine-grained tokens →
+              Generate new token → Repository access: <em>Only task-manager-data</em> →
+              Permissions → Contents: <em>Read and Write</em>
+            </li>
+            <li>
+              <strong>Enter your settings above and tap Save</strong>
+            </li>
+            <li>
+              <strong>Install on Android</strong><br>
+              Open this page in Chrome → tap the Chrome menu (&#8942;) → "Add to Home Screen" or "Install App"
+            </li>
+          </ol>
+        </div>
+
+        <hr class="settings-divider">
+
+        <div class="settings-help">
+          <h3>Claude Desktop MCP (Optional)</h3>
+          <p>Add to <code>%APPDATA%\Claude\claude_desktop_config.json</code> to manage tasks by talking to Claude:</p>
+          <pre class="code-block">{
+  "mcpServers": {
+    "github": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "your_token_here"
+      }
+    }
+  }
+}</pre>
+          <p>Then ask Claude: <em>"Show my overdue work cases"</em> or <em>"Add urgent personal task: call DA office, due tomorrow"</em></p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ==================== MODAL ==================== -->
+  <div id="modal-overlay" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="modal-title" class="modal-title">Add Task</h3>
+        <button id="modal-close" class="modal-close" aria-label="Close dialog">&times;</button>
+      </div>
+      <div id="modal-body" class="modal-body"></div>
+      <div class="modal-footer">
+        <button id="modal-cancel" class="btn-secondary">Cancel</button>
+        <button id="modal-save" class="btn-primary">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== TOASTS ==================== -->
+  <div id="toast-container" class="toast-container" aria-live="polite" aria-atomic="false"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
