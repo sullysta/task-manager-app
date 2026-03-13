@@ -396,11 +396,10 @@ function renderTaskSection(section) {
 
 function renderWorkSection() {
   const data = STATE.data.work;
-  const query = STATE.searchQuery;
+  const filteredCases = filterItems(data ? data.cases : []);
+  const groups = groupItems(filteredCases);
 
   preserveAndRender('work-groups', () => {
-    const filtered = filterCases(query, data.cases);
-    const groups = groupItems(filtered);
     const container = document.getElementById('work-groups');
     container.innerHTML = GROUP_DEFS.map(({ key, label, cls, defaultOpen }) => {
       const items = groups[key];
