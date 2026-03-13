@@ -280,7 +280,7 @@ function renderSection(section) {
 // Filter by search query
 function filterBySearch(items) {
   if (!STATE.searchQuery || !items) return items;
-  return items.filter(item => {
+  return result.filter(item => {
     const title = (item.title || '').toLowerCase();
     const notes = (item.notes || '').toLowerCase();
     return title.includes(STATE.searchQuery) || notes.includes(STATE.searchQuery);
@@ -295,7 +295,7 @@ function filterItems(items) {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   
-  return items.filter(item => {
+  return result.filter(item => {
     if (item.completed) return false;
     if (!item.due_date) return STATE.filter === 'all';
     
