@@ -1,7 +1,7 @@
 
 /* ── Tab Badge (task count) ─────────────────────────────────── */
 .tab-badge {
-  display: inline-flex !important;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   min-width: 18px;
@@ -14,4 +14,8 @@
   font-weight: 700;
   border-radius: 9px;
   vertical-align: middle;
+}
+.tab-badge:empty,
+.tab-badge[data-count="0"] {
+  display: none;
 }
