@@ -972,3 +972,24 @@ code {
   background: var(--text-muted);
   color: #fff;
 }
+
+/* ── Global Search ──────────────────────────────────────────── */
+.global-search {
+  padding: 0 12px 8px;
+}
+.global-search-input {
+  width: 100%;
+  padding: 8px 12px;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+}
+.global-search-input:focus {
+  border-color: var(--accent);
+  outline: none;
+}
+.global-search-input::placeholder {
+  color: var(--text-muted);
+}
