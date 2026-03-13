@@ -271,46 +271,6 @@ function renderSection(section) {
   const cat = CATEGORIES[section];
   if (cat.type === 'tasks') renderTaskSection(section);
   else renderWorkSection();
-  // Update badge counts
-  updateTabBadge("personal");
-  updateTabBadge("church");
-  updateTabBadge("work");
-}
-
-// Update tab badge count
-function updateTabBadge(section) {
-  const badge = document.querySelector(`[data-badge="${section}"]`);
-  if (!badge) return;
-  const data = STATE.data[section];
-  if (!data) {
-    badge.textContent = "";
-    return;
-  }
-  const activeTasks = data.tasks ? data.tasks.filter(t => !t.completed) : data.cases ? data.cases.filter(c => !c.completed) : [];
-  const count = activeTasks.length;
-  badge.textContent = count;
-  badge.style.display = count > 0 ? "inline-flex" : "none";
-}
-
-// Update all tab badges (call after all sections loaded)
-function updateAllBadges() {
-  ["personal", "church", "work"].forEach(updateTabBadge);
-}
-
-// Preload all sections to update badges (background)
-async function preloadAllSections() {
-  if (!hasSettings()) return;
-  for (const section of ["personal", "church", "work"]) {
-    try {
-      const cat = CATEGORIES[section];
-      const { sha, content } = await githubGet(cat.file);
-      STATE.data[section] = content;
-      STATE.fileSHAs[section] = sha;
-    } catch (e) {
-      // Ignore errors, section may not exist yet
-    }
-  }
-  updateAllBadges();
 }
 
 function preserveAndRender(containerId, renderFn) {
@@ -1069,8 +1029,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (hasSettings()) {
     switchTab('personal');
-    // Preload all sections in background for badge counts
-    preloadAllSections();
   } else {
     switchTab('settings');
     showToast('Welcome, Sully! Please configure your GitHub settings to get started.', 'info');
