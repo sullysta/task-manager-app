@@ -880,3 +880,24 @@ code {
 
 /* Scroll snap for smooth mobile UX on evidence lists */
 .evidence-list { scroll-snap-type: y proximity; }
+
+/* ── Tab Badge (task count) ─────────────────────────────────── */
+.tab-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  margin-left: 4px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 700;
+  border-radius: 9px;
+  vertical-align: middle;
+}
+.tab-badge:empty,
+.tab-badge[data-count="0"] {
+  display: none;
+}
