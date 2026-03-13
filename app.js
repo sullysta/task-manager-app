@@ -292,6 +292,27 @@ function updateTabBadge(section) {
   badge.style.display = count > 0 ? "inline-flex" : "none";
 }
 
+// Update all tab badges (call after all sections loaded)
+function updateAllBadges() {
+  ["personal", "church", "work"].forEach(updateTabBadge);
+}
+
+// Preload all sections to update badges (background)
+async function preloadAllSections() {
+  if (!hasSettings()) return;
+  for (const section of ["personal", "church", "work"]) {
+    try {
+      const cat = CATEGORIES[section];
+      const { sha, content } = await githubGet(cat.file);
+      STATE.data[section] = content;
+      STATE.fileSHAs[section] = sha;
+    } catch (e) {
+      // Ignore errors, section may not exist yet
+    }
+  }
+  updateAllBadges();
+}
+
 function preserveAndRender(containerId, renderFn) {
   const container = document.getElementById(containerId);
   const hadContent = container && container.children.length > 0;
@@ -1048,6 +1069,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (hasSettings()) {
     switchTab('personal');
+    // Preload all sections in background for badge counts
+    preloadAllSections();
   } else {
     switchTab('settings');
     showToast('Welcome, Sully! Please configure your GitHub settings to get started.', 'info');
