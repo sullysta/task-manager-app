@@ -36,6 +36,7 @@ const GROUP_DEFS = [
 // ── Application State ──────────────────────────────────────────
 const STATE = {
   activeTab:   'personal',
+  filter:      'all',
   settings:    { owner: '', repo: '', token: '' },
   data:        { personal: null, church: null, work: null },
   fileSHAs:    { personal: null, church: null, work: null },
@@ -274,6 +275,28 @@ function renderSection(section) {
   updateAllBadges();
 }
 
+// Filter items based on current filter
+function filterItems(items) {
+  if (STATE.filter === 'all' || !items) return items || [];
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  
+  return items.filter(item => {
+    if (item.completed) return false;
+    if (!item.due_date) return STATE.filter === 'all';
+    
+    const due = new Date(item.due_date);
+    due.setHours(0, 0, 0, 0);
+    const daysDiff = Math.floor((due - today) / (1000 * 60 * 60 * 24));
+    
+    if (STATE.filter === 'urgent') return item.priority === 'urgent';
+    if (STATE.filter === 'today') return daysDiff === 0;
+    if (STATE.filter === 'overdue') return daysDiff < 0;
+    return true;
+  });
+}
+
+// Update renderTaskSection to use filtering
 // Update tab badge count after rendering
 function updateTabBadge(section) {
   const badge = document.querySelector(`[data-badge="${section}"]`);
@@ -328,8 +351,9 @@ function preserveAndRender(containerId, renderFn) {
 
 function renderTaskSection(section) {
   const data = STATE.data[section];
+  const filteredTasks = filterItems(data ? data.tasks : []);
   preserveAndRender(`${section}-groups`, () => {
-    const groups = groupItems(data.tasks);
+    const groups = groupItems(filteredTasks);
     const container = document.getElementById(`${section}-groups`);
     container.innerHTML = GROUP_DEFS.map(({ key, label, cls, defaultOpen }) => {
       const items = groups[key];
@@ -1033,6 +1057,16 @@ function setupEventListeners() {
   // Close modal on Escape
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape') hideModal();
+  });
+
+  // Filter bar buttons
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      STATE.filter = btn.dataset.filter;
+      renderSection(STATE.activeTab);
+    });
   });
 
   // Task tab event delegation
