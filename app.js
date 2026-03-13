@@ -271,6 +271,26 @@ function renderSection(section) {
   const cat = CATEGORIES[section];
   if (cat.type === 'tasks') renderTaskSection(section);
   else renderWorkSection();
+  updateAllBadges();
+}
+
+// Update tab badge count after rendering
+function updateTabBadge(section) {
+  const badge = document.querySelector(`[data-badge="${section}"]`);
+  if (!badge) return;
+  const data = STATE.data[section];
+  if (!data) {
+    badge.textContent = "";
+    return;
+  }
+  const activeTasks = data.tasks ? data.tasks.filter(t => !t.completed) : data.cases ? data.cases.filter(c => !c.completed) : [];
+  const count = activeTasks.length;
+  badge.textContent = count;
+  badge.style.display = count > 0 ? "inline-flex" : "none";
+}
+
+function updateAllBadges() {
+  ["personal", "church", "work"].forEach(updateTabBadge);
 }
 
 function preserveAndRender(containerId, renderFn) {
