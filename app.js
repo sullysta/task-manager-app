@@ -36,7 +36,6 @@ const GROUP_DEFS = [
 // ── Application State ──────────────────────────────────────────
 const STATE = {
   activeTab:   'personal',
-  filter:      'all',
   settings:    { owner: '', repo: '', token: '' },
   data:        { personal: null, church: null, work: null },
   fileSHAs:    { personal: null, church: null, work: null },
@@ -275,29 +274,6 @@ function renderSection(section) {
   updateAllBadges();
 }
 
-function applyFilter(items) {
-  if (!items) return [];
-  if (STATE.filter === 'all' || !STATE.filter) return items;
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  
-  return items.filter(item => {
-    if (item.completed) return false;
-    
-    if (STATE.filter === 'urgent') return item.priority === 'urgent';
-    
-    if (!item.due_date) return false;
-    
-    const due = new Date(item.due_date);
-    due.setHours(0, 0, 0, 0);
-    const daysDiff = Math.floor((due - today) / (1000 * 60 * 60 * 24));
-    
-    if (STATE.filter === 'today') return daysDiff === 0;
-    if (STATE.filter === 'overdue') return daysDiff < 0;
-    return false;
-  });
-}
-
 // Update tab badge count after rendering
 function updateTabBadge(section) {
   const badge = document.querySelector(`[data-badge="${section}"]`);
@@ -353,7 +329,7 @@ function preserveAndRender(containerId, renderFn) {
 function renderTaskSection(section) {
   const data = STATE.data[section];
   preserveAndRender(`${section}-groups`, () => {
-    const groups = groupItems(applyFilter(data ? data.tasks : []));
+    const groups = groupItems(data.tasks);
     const container = document.getElementById(`${section}-groups`);
     container.innerHTML = GROUP_DEFS.map(({ key, label, cls, defaultOpen }) => {
       const items = groups[key];
@@ -382,23 +358,14 @@ function renderTaskSection(section) {
 
 function renderWorkSection() {
   const data = STATE.data.work;
-  
+  const query = STATE.searchQuery;
+
   preserveAndRender('work-groups', () => {
-    let items = data ? data.cases : [];
-    // Apply search filter
-    if (STATE.searchQuery) {
-      const q = STATE.searchQuery.toLowerCase();
-      items = items.filter(c =>
-        (c.case_number || '').toLowerCase().includes(q) ||
-        (c.submitting_agency || '').toLowerCase().includes(q) ||
-        (c.case_agent || '').toLowerCase().includes(q) ||
-        (c.synopsis || '').toLowerCase().includes(q)
-      );
-    }
-    const groups = groupItems(applyFilter(items));
+    const filtered = filterCases(query, data.cases);
+    const groups = groupItems(filtered);
     const container = document.getElementById('work-groups');
     container.innerHTML = GROUP_DEFS.map(({ key, label, cls, defaultOpen }) => {
-      const groupItems = groups[key];
+      const items = groups[key];
       if (items.length === 0 && key !== 'active') return '';
       return renderGroupSection(
         `work-${key}`,
@@ -1066,16 +1033,6 @@ function setupEventListeners() {
   // Close modal on Escape
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape') hideModal();
-  });
-
-  // Filter bar buttons
-  document.querySelectorAll('.filter-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      STATE.filter = btn.dataset.filter;
-      renderSection(STATE.activeTab);
-    });
   });
 
   // Task tab event delegation
