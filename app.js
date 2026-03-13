@@ -37,6 +37,7 @@ const GROUP_DEFS = [
 const STATE = {
   activeTab:   'personal',
   filter:      'all',
+  searchQuery: '',
   settings:    { owner: '', repo: '', token: '' },
   data:        { personal: null, church: null, work: null },
   fileSHAs:    { personal: null, church: null, work: null },
@@ -276,8 +277,21 @@ function renderSection(section) {
 }
 
 // Filter items based on current filter
+// Filter by search query
+function filterBySearch(items) {
+  if (!STATE.searchQuery || !items) return items;
+  return items.filter(item => {
+    const title = (item.title || '').toLowerCase();
+    const notes = (item.notes || '').toLowerCase();
+    return title.includes(STATE.searchQuery) || notes.includes(STATE.searchQuery);
+  });
+}
+
 function filterItems(items) {
-  if (STATE.filter === 'all' || !items) return items || [];
+  let result = items || [];
+  // Apply search filter first
+  result = filterBySearch(result);
+  if (STATE.filter === 'all') return result;
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   
@@ -1057,6 +1071,12 @@ function setupEventListeners() {
   // Close modal on Escape
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape') hideModal();
+  });
+
+  // Global search
+  document.getElementById('global-search').addEventListener('input', (e) => {
+    STATE.searchQuery = e.target.value.toLowerCase();
+    renderSection(STATE.activeTab);
   });
 
   // Filter bar buttons
