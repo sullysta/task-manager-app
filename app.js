@@ -276,7 +276,8 @@ function renderSection(section) {
 }
 
 function applyFilter(items) {
-  if (!items || STATE.filter === 'all' || !STATE.filter) return items;
+  if (!items) return [];
+  if (STATE.filter === 'all' || !STATE.filter) return items;
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   
@@ -352,7 +353,7 @@ function preserveAndRender(containerId, renderFn) {
 function renderTaskSection(section) {
   const data = STATE.data[section];
   preserveAndRender(`${section}-groups`, () => {
-    const groups = groupItems(applyFilter(data.tasks));
+    const groups = groupItems(applyFilter(data ? data.tasks : []));
     const container = document.getElementById(`${section}-groups`);
     container.innerHTML = GROUP_DEFS.map(({ key, label, cls, defaultOpen }) => {
       const items = groups[key];
@@ -381,14 +382,23 @@ function renderTaskSection(section) {
 
 function renderWorkSection() {
   const data = STATE.data.work;
-  const query = STATE.searchQuery;
-
+  
   preserveAndRender('work-groups', () => {
-    const filtered = filterCases(query, data.cases);
-    const groups = groupItems(filtered);
+    let items = data ? data.cases : [];
+    // Apply search filter
+    if (STATE.searchQuery) {
+      const q = STATE.searchQuery.toLowerCase();
+      items = items.filter(c =>
+        (c.case_number || '').toLowerCase().includes(q) ||
+        (c.submitting_agency || '').toLowerCase().includes(q) ||
+        (c.case_agent || '').toLowerCase().includes(q) ||
+        (c.synopsis || '').toLowerCase().includes(q)
+      );
+    }
+    const groups = groupItems(applyFilter(items));
     const container = document.getElementById('work-groups');
     container.innerHTML = GROUP_DEFS.map(({ key, label, cls, defaultOpen }) => {
-      const items = groups[key];
+      const groupItems = groups[key];
       if (items.length === 0 && key !== 'active') return '';
       return renderGroupSection(
         `work-${key}`,
