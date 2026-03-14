@@ -267,6 +267,24 @@ function filterCases(query, cases) {
 }
 
 // ── Rendering ──────────────────────────────────────────────────
+// Simple filter function
+function applyFilter(items) {
+  if (!items || STATE.filter === 'all') return items;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  return items.filter(item => {
+    if (item.completed) return false;
+    if (STATE.filter === 'urgent') return item.priority === 'urgent';
+    if (!item.due_date) return false;
+    const due = new Date(item.due_date);
+    due.setHours(0, 0, 0, 0);
+    const days = Math.floor((due - today) / (1000*60*60*24));
+    if (STATE.filter === 'today') return days === 0;
+    if (STATE.filter === 'overdue') return days < 0;
+    return false;
+  });
+}
+
 function renderSection(section) {
   if (!STATE.data[section]) return;
   const cat = CATEGORIES[section];
@@ -294,7 +312,7 @@ function preserveAndRender(containerId, renderFn) {
 function renderTaskSection(section) {
   const data = STATE.data[section];
   preserveAndRender(`${section}-groups`, () => {
-    const groups = groupItems(data.tasks);
+    const groups = groupItems(applyFilter(data.tasks));
     const container = document.getElementById(`${section}-groups`);
     container.innerHTML = GROUP_DEFS.map(({ key, label, cls, defaultOpen }) => {
       const items = groups[key];
