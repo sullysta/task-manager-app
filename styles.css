@@ -880,3 +880,28 @@ code {
 
 /* Scroll snap for smooth mobile UX on evidence lists */
 .evidence-list { scroll-snap-type: y proximity; }
+
+/* Filter Bar */
+.filter-bar {
+  display: flex;
+  gap: 6px;
+  padding: 8px 12px;
+  overflow-x: auto;
+}
+.filter-btn {
+  padding: 6px 12px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.filter-btn:hover { background: var(--bg-card); }
+.filter-btn.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
