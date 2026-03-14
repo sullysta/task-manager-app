@@ -1000,6 +1000,19 @@ function setupEventListeners() {
     if (e.key === 'Escape') hideModal();
   });
 
+  // Filter buttons
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      STATE.filter = btn.dataset.filter;
+      // Refresh current tab
+      const cat = CATEGORIES[STATE.activeTab];
+      if (cat && cat.type === 'tasks') renderTaskSection(STATE.activeTab);
+      else renderWorkSection();
+    });
+  });
+
   // Task tab event delegation
   document.getElementById('personal-view').addEventListener('click', handleTaskViewClick('personal'));
   document.getElementById('church-view').addEventListener('click',   handleTaskViewClick('church'));
