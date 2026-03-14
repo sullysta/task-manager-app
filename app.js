@@ -36,6 +36,7 @@ const GROUP_DEFS = [
 // ── Application State ──────────────────────────────────────────
 const STATE = {
   activeTab:   'personal',
+  filter:      'all',
   settings:    { owner: '', repo: '', token: '' },
   data:        { personal: null, church: null, work: null },
   fileSHAs:    { personal: null, church: null, work: null },
